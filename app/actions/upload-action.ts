@@ -32,7 +32,7 @@ export async function checkFileExists(filename: string) {
 }
 
 export async function uploadToR2(filename: string, data: Buffer | ArrayBuffer) {
-  let bodyData = Buffer.isBuffer(data) ? data : Buffer.from(data);
+  const bodyData = Buffer.isBuffer(data) ? data : Buffer.from(data);
   const extension = getExtension(filename);
 
   const contentType = getMimeType(extension === "heic" ? "jpg" : extension);
