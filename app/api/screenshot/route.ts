@@ -1,3 +1,4 @@
+import { generateFileName, uploadToR2 } from "@/app/actions/upload-action"
 import { NextResponse } from "next/server"
 import puppeteer from "puppeteer-core"
 
@@ -32,8 +33,6 @@ export async function GET(request: Request) {
     waitUntil: ["load", "networkidle2"],
     timeout: 60000,
   })
-
-
 
   await page.waitForSelector('#poster .cabinet-item', {
     visible: true, // 确保元素不仅存在，而且可见
@@ -95,17 +94,19 @@ export async function GET(request: Request) {
   })
   await browser.close()
 
-  const base64Image = Buffer.from(screenshot).toString('base64');
+  // return new NextResponse(screenshot, {
+  //   status: 200,
+  //   headers: { "Content-Type": "image/png" },
+  // })
+
+  const filename = await generateFileName(screenshot, 'webp');
+  // 上传screenshot并返回图片url
+  const publicUrl = await uploadToR2(filename, screenshot);
+
   return NextResponse.json({
-        message: "截图生成成功",
-        imageData: base64Image,
-        imageType: "image/webp" // 可以在这里带上图片类型信息
-      }, {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        }
-      })
+    success: true,
+    url: publicUrl
+  });
 }
 
 export const maxDuration = 60
